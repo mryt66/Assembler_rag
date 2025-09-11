@@ -1,9 +1,9 @@
-requests
+google-generativeai
 sentence-transformers
-scipy
-pymupdf
-fastapi
 faiss-cpu
-SQLAlchemy
+numpy
+fastapi
+uvicorn
+sqlalchemy
 pydantic
-uvicorn[standard]
+PyMuPDF

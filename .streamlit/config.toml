@@ -1,4 +1,0 @@
-[global]
-developmentMode = false
-[server]
-fileWatcherType = "none"

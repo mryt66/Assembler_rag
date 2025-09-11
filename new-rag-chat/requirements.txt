@@ -1,9 +1,0 @@
-google-generativeai
-sentence-transformers
-faiss-cpu
-numpy
-fastapi
-uvicorn
-sqlalchemy
-pydantic
-PyMuPDF

@@ -28,15 +28,7 @@ class RAGState:
 def initialize_system() -> RAGState:
     model_name = os.getenv("EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-0.6B")
     print(f"Loading embedding model: {model_name} ...")
-    try:
-        model = SentenceTransformer(model_name)
-    except Exception as e:  # noqa: BLE001
-        fallback = "all-MiniLM-L6-v2"
-        if model_name != fallback:
-            print(f"Primary model load failed ({e}); falling back to {fallback}")
-            model = SentenceTransformer(fallback)
-        else:
-            raise
+    model = SentenceTransformer(model_name)
 
     print("Loading chunks & prompt config...")
     chunks_path = config.OUTPUT_CHUNKS_FILE
