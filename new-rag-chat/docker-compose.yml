@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  rag-api:
+    build: .
+    image: rag-chat-api:latest
+    container_name: rag-chat-api
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-Qwen/Qwen3-Embedding-0.6B}
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
