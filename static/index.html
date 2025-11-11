@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAG Chat</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>RAG Chat</h1>
+      <div class="status" id="status">Ready</div>
+    </header>
+
+    <main id="chat" class="chat"></main>
+
+    <form id="chat-form" class="input">
+      <textarea id="message" rows="2" placeholder="Type your message..." required></textarea>
+      <button id="send" type="submit">Send</button>
+    </form>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
