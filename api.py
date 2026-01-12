@@ -4,13 +4,11 @@ from datetime import datetime
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 import uvicorn
-from pathlib import Path
+# from pathlib import Path
 
 from database.db import get_db, init_db, Conversation
 from embeddings.initialize import initialize_system, RAGState
@@ -60,20 +58,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Static UI setup
-BASE_DIR = Path(__file__).resolve().parent
-STATIC_DIR = BASE_DIR / "static"
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-
-
-@app.get("/", include_in_schema=False)
-def root_page():
-    index_path = STATIC_DIR / "index.html"
-    if not index_path.exists():
-        # Fallback message if UI not built
-        return {"message": "UI not found. Use /docs or POST /chat."}
-    return FileResponse(str(index_path))
+# No static UI; use Swagger at /docs
 
 
 @app.post("/chat", response_model=ChatResponse)

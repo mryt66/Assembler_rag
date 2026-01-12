@@ -16,3 +16,5 @@ PyYAML
 langfuse
 openai  
 openinference-instrumentation-google-genai
+streamlit
+requests

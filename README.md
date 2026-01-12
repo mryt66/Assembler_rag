@@ -73,19 +73,6 @@ Then visit: http://localhost:8000/docs
 ## Conversation Storage
 SQLite file: `data/conversations.db` (table `conversations`). Each row includes query, response, derived context, system/base chunks, full assembled prompt, and timestamp.
 
-## LLM Judge (Binary Relevance to Maszyna W)
-After generating an answer with Gemini, a secondary evaluation step runs a dedicated judge prompt (stored in `data/judge_prompt.yaml`).
-
-Behavior:
-- Judge prompt requests a single digit output: `1` if the answer pertains to programming in Maszyna W (assembly language, its instructions), `0` otherwise.
-- If the judgment is `0`, the API (when integrated) can replace the original LLM answer with a standardized guidance message:
-  `Twoje zapytanie <user_input> nie jest związane z Językiem Maszyny W. Proszę o zadanie pytania dotyczącego tego języka.`
-- The judge template is loaded only from YAML (no fallback hardcoded prompt). Missing template disables evaluation.
-
-Files:
-- `data/judge_prompt.yaml` – evaluation template (must contain `{output}` placeholder).
-- `gemini/client.py` – functions: `get_answer`, `evaluate_answer`, `get_answer_and_judgment`.
-
 ## Optional Langfuse Tracing
 Langfuse spans are created around Gemini calls if Langfuse keys are present. This is fully optional and does not affect core functionality.
 
@@ -100,7 +87,6 @@ If keys are absent/invalid, tracing is skipped without failing the request.
 ## Docker Usage Notes
 The `docker-compose.yml` passes relevant environment variables and mounts `./data` to persist:
 - Chunk artifacts (embeddings, FAISS index)
-- Prompt config and judge YAML
 - Conversation history
 
 Build & run:
@@ -112,12 +98,7 @@ set GEMINI_API_KEY=YOUR_KEY
 docker compose up --build
 ```
 Then access:
-- API: http://localhost:8000
 - Swagger: http://localhost:8000/docs
-
-To update judge behavior:
-1. Edit `data/judge_prompt.yaml`
-2. Restart container (hot reload for prompt not implemented yet)
 
 To force re-embedding after content changes:
 1. Modify PDFs / `.prg` files
