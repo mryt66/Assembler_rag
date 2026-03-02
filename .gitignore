@@ -40,6 +40,7 @@ Thumbs.db
 # Env files and secrets
 .env
 .env.*
+!.env.example
 .envrc
 
 # Logs
@@ -49,17 +50,8 @@ logs/
 # Notebooks
 .ipynb_checkpoints/
 
-# Project data artifacts (generated at runtime)
-# Keep source PDFs/PRGs and judge YAML tracked; ignore generated caches and DB
-/data/chunk_embeddings.npy
-/data/faiss_index.index
-/data/conversations.db
-/data/output_chunks.jsonl
-
-# FAISS / embedding caches elsewhere (just in case)
-*.index
-*.npy
-*.db
+# Data directory (runtime-mounted volume)
+data/
 
 # Docker override (local-only)
 docker-compose.override.yml

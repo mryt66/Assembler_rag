@@ -13,8 +13,3 @@ openinference-instrumentation
 openinference-instrumentation-google-genai
 python-dotenv
 PyYAML
-langfuse
-openai  
-openinference-instrumentation-google-genai
-streamlit
-requests

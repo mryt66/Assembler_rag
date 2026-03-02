@@ -1,15 +1,8 @@
-version: '3.8'
 services:
   rag-api:
     build: .
-    image: rag-chat-api:latest
     container_name: rag-chat-api
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-Qwen/Qwen3-Embedding-0.6B}
-      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
-      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
-      - LANGFUSE_HOST=${LANGFUSE_HOST}
+    env_file: .env
     volumes:
       - ./data:/app/data
     ports:
