@@ -32,9 +32,25 @@ API available at http://localhost:8000/docs
 
 | Variable | Required | Description |
 |---|---|---|
-| `GEMINI_API_KEY` | Yes | Google Gemini API key |
 | `EMBEDDING_MODEL` | No | SentenceTransformer model (default: `Qwen/Qwen3-Embedding-0.6B`) |
 | `LANGFUSE_PUBLIC_KEY` | No | Langfuse public key |
 | `LANGFUSE_SECRET_KEY` | No | Langfuse secret key |
 | `LANGFUSE_HOST` | No | Langfuse host URL |
+
+## Chat API Contract
+
+`POST /chat` requires `gemini_api_key` in the JSON body.
+
+Example payload:
+
+```json
+{
+	"query": "How does SOZ work?",
+	"gemini_api_key": "YOUR_GEMINI_API_KEY",
+	"history": [
+		{"role": "user", "message": "..."},
+		{"role": "assistant", "message": "..."}
+	]
+}
+```
 

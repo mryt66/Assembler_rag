@@ -1,14 +1,10 @@
-from __future__ import annotations
-
 import os
 from dataclasses import dataclass
-from typing import Optional
-
 import faiss
 import numpy as np
+from typing import Optional
 from sentence_transformers import SentenceTransformer
-
-from app import config
+from config.config import settings
 from .loader import load_json, compute_and_cache_embeddings
 
 
@@ -27,17 +23,19 @@ class RAGState:
 
 
 def initialize_system() -> RAGState:
-    model_name = os.getenv("EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-0.6B")
+    model_name = settings.embedding_model or os.getenv(
+        "EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-0.6B"
+    )
     model = SentenceTransformer(model_name)
 
-    chunks = load_json(config.OUTPUT_CHUNKS_FILE)
-    prompt_cfg = load_json(config.RAG_CONFIG_FILE)[0]
+    chunks = load_json(settings.output_chunks_file)
+    prompt_cfg = load_json(settings.rag_config_file)[0]
 
     emb, index = compute_and_cache_embeddings(
         chunks=chunks,
         model=model,
-        embeddings_file=config.EMBEDDINGS_FILE,
-        index_file=config.FAISS_INDEX_FILE,
+        embeddings_file=settings.embeddings_file,
+        index_file=settings.faiss_index_file,
     )
 
     return RAGState(

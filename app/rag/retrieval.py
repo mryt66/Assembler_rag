@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 import faiss
-
+from typing import Any
 from app.embeddings.initialize import RAGState
 
 
-def retrieve_relevant_chunks(state: RAGState, query: str, top_k: int = 3) -> list[dict]:
+def retrieve_relevant_chunks(
+    state: RAGState, query: str, top_k: int = 3
+) -> list[dict[str, Any]]:
     if state.faiss_index is None or state.chunk_embeddings is None:
         raise RuntimeError("RAG index not initialized")
 
