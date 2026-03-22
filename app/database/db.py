@@ -1,17 +1,13 @@
-from __future__ import annotations
-
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Generator
-
 from sqlalchemy import Column, DateTime, Integer, Text, create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from config.config import settings
 
-from app.config import DATA_DIR
+settings.data_dir.mkdir(exist_ok=True)
 
-DATA_DIR.mkdir(exist_ok=True)
-
-DATABASE_URL = f"sqlite:///{DATA_DIR / 'conversations.db'}"
+DATABASE_URL = f"sqlite:///{settings.db_file}"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
@@ -31,11 +27,11 @@ class Conversation(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
 
-def init_db():
+def init_db() -> None:
     Base.metadata.create_all(bind=engine)
 
 
-def get_db():
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db

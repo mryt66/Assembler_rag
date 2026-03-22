@@ -1,21 +1,18 @@
-from __future__ import annotations
-
 from contextlib import asynccontextmanager
-
+from collections.abc import AsyncIterator
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
-
 from app.database.db import get_db, init_db, Conversation
 from app.embeddings.initialize import initialize_system, RAGState
 from app.rag.prompt_utils import construct_prompt, format_history
 from app.gemini.client import get_answer
-from app.schemas import ChatRequest, ChatResponse
+from config.schemas import ChatRequest, ChatResponse
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     init_db()
     state = initialize_system()
     app.state.rag_state = state
@@ -37,12 +34,15 @@ app.add_middleware(
 async def chat(payload: ChatRequest, db: Session = Depends(get_db)):
     state: RAGState = app.state.rag_state
     query = (payload.query or "").strip()
+    api_key = (payload.gemini_api_key or "").strip()
     if not query:
         raise HTTPException(status_code=400, detail="Query cannot be empty")
+    if not api_key:
+        raise HTTPException(status_code=400, detail="gemini_api_key cannot be empty")
 
     history_text = format_history(payload.history)
     full_prompt, context = construct_prompt(state, query, history_text)
-    answer = await run_in_threadpool(get_answer, full_prompt)
+    answer = await run_in_threadpool(get_answer, full_prompt, api_key)
     if not answer:
         answer = "Sorry, I failed to get a response from Gemini. Please try again."
 
@@ -64,5 +64,5 @@ async def chat(payload: ChatRequest, db: Session = Depends(get_db)):
 
 
 @app.get("/health")
-def health():
+def health() -> dict[str, str]:
     return {"status": "ok"}

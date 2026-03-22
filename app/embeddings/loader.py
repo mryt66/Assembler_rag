@@ -1,14 +1,12 @@
-from __future__ import annotations
-
 import json
 from pathlib import Path
-
+from typing import Any
 import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 
-def load_json(path: Path):
+def load_json(path: Path) -> Any:
     try:
         with path.open("r", encoding="utf-8") as f:
             return json.load(f)
@@ -20,11 +18,11 @@ def load_json(path: Path):
 
 def compute_and_cache_embeddings(
     *,
-    chunks: list[dict],
+    chunks: list[dict[str, Any]],
     model: SentenceTransformer,
     embeddings_file: Path,
     index_file: Path,
-):
+) -> tuple[np.ndarray, faiss.Index]:
     texts = [c["content"] for c in chunks]
 
     if embeddings_file.exists():

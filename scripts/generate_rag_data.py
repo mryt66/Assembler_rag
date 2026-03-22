@@ -1,11 +1,10 @@
 import json
 from pathlib import Path
-from typing import List
-
+from typing import Any
 import fitz
-import google.generativeai as genai
-
-from app.config import Chunk, Settings
+from google import genai
+from pydantic import BaseModel
+from config.config import settings
 
 
 def extract_pdf_text(filename: str) -> str:
@@ -16,8 +15,12 @@ def extract_pdf_text(filename: str) -> str:
     return text
 
 
-def chunk_pdf(filename: str) -> List[Chunk]:
-    client = genai.Client()
+def chunk_pdf(filename: str) -> list[dict[str, Any]]:
+    api_key = settings.gemini_api_key
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY not set")
+
+    client = genai.Client(api_key=api_key)
     text = extract_pdf_text(filename)
     pdf_name = Path(filename).name
 
@@ -39,19 +42,22 @@ def chunk_pdf(filename: str) -> List[Chunk]:
     """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=settings.gemini_model,
         contents=prompt,
         config={
             "response_mime_type": "application/json",
-            "response_schema": Settings.response_schema,
+            "response_schema": settings.response_schema,
         },
     )
 
-    chunks: List[Chunk] = response.parsed
+    parsed = response.parsed
+    chunks: list[dict[str, Any]] = [
+        c.model_dump() if isinstance(c, BaseModel) else c for c in (parsed or [])
+    ]
     return chunks
 
 
-def process_pdf_folder(folder_path):
+def process_pdf_folder(folder_path: str | Path) -> list[dict[str, Any]]:
     folder = Path(folder_path)
     pdfs = sorted(folder.glob("*.pdf"), key=lambda x: x.name)
     if not pdfs:
@@ -60,12 +66,12 @@ def process_pdf_folder(folder_path):
     all_chunks = []
     for pdf_file in pdfs:
         print(f"Processing PDF: {pdf_file.name}")
-        chunks = chunk_pdf(filename=pdf_file)
+        chunks = chunk_pdf(filename=str(pdf_file))
         all_chunks.extend(chunks)
     return all_chunks
 
 
-def make_prg_chunk(text, filename):
+def make_prg_chunk(text: str, filename: str | Path) -> list[dict[str, Any]]:
     return [
         {
             "content": text.strip(),
@@ -76,7 +82,7 @@ def make_prg_chunk(text, filename):
     ]
 
 
-def process_prg_folder(folder_path):
+def process_prg_folder(folder_path: str | Path) -> list[dict[str, Any]]:
     folder = Path(folder_path)
     prgs = sorted(folder.glob("*.prg"), key=lambda x: x.name)
     if not prgs:
@@ -91,12 +97,11 @@ def process_prg_folder(folder_path):
     return all_chunks
 
 
-def main():
-    base_dir = Path(__file__).resolve().parent.parent
-    data_dir = base_dir / "data"
+def main() -> None:
+    data_dir = settings.data_dir
     pdf_folder = data_dir / "pdfs"
     prg_folder = data_dir / "prg"
-    output_jsonl = data_dir / "output_chunks.jsonl"
+    output_jsonl = settings.output_chunks_file
 
     all_chunks = process_pdf_folder(pdf_folder)
     all_chunks += process_prg_folder(prg_folder)
